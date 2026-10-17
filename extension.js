@@ -52,19 +52,9 @@ const LAYOUT_PRESETS = [
         ]
     },
     {
-        id: 'layout-split-stacked',
-        title: 'Left Half, 2 Stacked Right',
-        key: '5',
-        zones: [
-            { id: 'left', x: 0, y: 0, w: 0.5, h: 1.0 },
-            { id: 'top-right', x: 0.5, y: 0, w: 0.5, h: 0.5 },
-            { id: 'bottom-right', x: 0.5, y: 0.5, w: 0.5, h: 0.5 }
-        ]
-    },
-    {
         id: 'layout-center-focus',
         title: 'Center Focus (25 / 50 / 25)',
-        key: '6',
+        key: '5',
         zones: [
             { id: 'left', x: 0, y: 0, w: 0.25, h: 1.0 },
             { id: 'center', x: 0.25, y: 0, w: 0.5, h: 1.0 },
@@ -475,7 +465,6 @@ class SnapManager {
         this.layoutTwoPriority = true;
         this.layoutThreeEqual = true;
         this.layoutFourGrid = true;
-        this.layoutSplitStacked = true;
         this.layoutCenterFocus = true;
 
         this._tickTimerId = 0;
@@ -510,7 +499,6 @@ class SnapManager {
             this.settings.bindProperty(Settings.BindingDirection.IN, 'layout-two-priority', 'layoutTwoPriority', this._onLayoutsChanged.bind(this), null);
             this.settings.bindProperty(Settings.BindingDirection.IN, 'layout-three-equal', 'layoutThreeEqual', this._onLayoutsChanged.bind(this), null);
             this.settings.bindProperty(Settings.BindingDirection.IN, 'layout-four-grid', 'layoutFourGrid', this._onLayoutsChanged.bind(this), null);
-            this.settings.bindProperty(Settings.BindingDirection.IN, 'layout-split-stacked', 'layoutSplitStacked', this._onLayoutsChanged.bind(this), null);
             this.settings.bindProperty(Settings.BindingDirection.IN, 'layout-center-focus', 'layoutCenterFocus', this._onLayoutsChanged.bind(this), null);
         } catch (e) {
             global.logWarning(`CinnWin: Could not initialize settings: ${e.message}`);
@@ -558,7 +546,6 @@ class SnapManager {
                 case 'layout-two-priority': return this.layoutTwoPriority;
                 case 'layout-three-equal': return this.layoutThreeEqual;
                 case 'layout-four-grid': return this.layoutFourGrid;
-                case 'layout-split-stacked': return this.layoutSplitStacked;
                 case 'layout-center-focus': return this.layoutCenterFocus;
                 default: return true;
             }

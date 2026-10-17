@@ -28,8 +28,7 @@ A modern, fluid Cinnamon Desktop extension for advanced window management and la
 | **2** | **67 / 33 Priority Left** | Large left focus pane (2/3) and right sidebar (1/3) |
 | **3** | **3 Equal Columns** | Three equal columns (1/3 each) |
 | **4** | **4 Quadrants Grid** | 2x2 grid (Top-Left, Top-Right, Bottom-Left, Bottom-Right) |
-| **5** | **Split Left, Stacked Right** | Half-width left pane with two quarters stacked on the right |
-| **6** | **Center Focus** | 25% left sidebar, 50% center workspace, 25% right sidebar |
+| **5** | **Center Focus** | 25% left sidebar, 50% center workspace, 25% right sidebar |
 
 ---
 

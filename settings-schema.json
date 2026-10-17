@@ -86,14 +86,9 @@
         "default": true,
         "description": "Layout 4: 4 Quadrants (2x2)"
     },
-    "layout-split-stacked": {
-        "type": "checkbox",
-        "default": true,
-        "description": "Layout 5: Left Half, 2 Stacked Right"
-    },
     "layout-center-focus": {
         "type": "checkbox",
         "default": true,
-        "description": "Layout 6: Center Focus (25 / 50 / 25)"
+        "description": "Layout 5: Center Focus (25 / 50 / 25)"
     }
 }
