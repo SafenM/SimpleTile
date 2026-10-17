@@ -1,5 +1,5 @@
 {
-    "uuid": "simple-tile@maciej",
+    "uuid": "simple-tile@SafenM",
     "name": "Simple Tile",
     "description": "Simple and intuitive window tiling for Cinnamon. Drag a window to the top of any screen or use a shortcut to choose a layout and tile windows.",
     "version": "1.0.0",
@@ -12,6 +12,6 @@
         "6.4",
         "6.6"
     ],
-    "author": "maciej",
-    "url": "https://github.com/maciej/simple-tile"
+    "author": "SafenM",
+    "url": "https://github.com/SafenM/simple-tile"
 }

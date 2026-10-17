@@ -6,7 +6,7 @@
 
 set -e
 
-UUID="simple-tile@maciej"
+UUID="simple-tile@SafenM"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 EXT_DIR="${HOME}/.local/share/cinnamon/extensions/${UUID}"
 
@@ -31,27 +31,28 @@ usage() {
 }
 
 cleanup_legacy() {
-    # Migrate old cinnwin@snaplayouts if present
-    OLD_UUID="cinnwin@snaplayouts"
-    OLD_DIR="${HOME}/.local/share/cinnamon/extensions/${OLD_UUID}"
-    OLD_CONFIG_DIR="${HOME}/.config/cinnamon/spices/${OLD_UUID}"
+    # Migrate old simple-tile@maciej or cinnwin@snaplayouts if present
     NEW_CONFIG_DIR="${HOME}/.config/cinnamon/spices/${UUID}"
 
-    if [ -e "${OLD_DIR}" ]; then
-        echo "-> Cleaning up legacy ${OLD_UUID}..."
-        rm -rf "${OLD_DIR}"
-    fi
+    for OLD_UUID in "simple-tile@maciej" "cinnwin@snaplayouts"; do
+        OLD_DIR="${HOME}/.local/share/cinnamon/extensions/${OLD_UUID}"
+        OLD_CONFIG_DIR="${HOME}/.config/cinnamon/spices/${OLD_UUID}"
 
-    # Migrate config if exists
-    if [ -f "${OLD_CONFIG_DIR}/${OLD_UUID}.json" ] && [ ! -f "${NEW_CONFIG_DIR}/${UUID}.json" ]; then
-        echo "-> Preserving existing user preferences..."
-        mkdir -p "${NEW_CONFIG_DIR}"
-        cp "${OLD_CONFIG_DIR}/${OLD_UUID}.json" "${NEW_CONFIG_DIR}/${UUID}.json"
-    fi
+        if [ -e "${OLD_DIR}" ]; then
+            echo "-> Cleaning up legacy ${OLD_UUID}..."
+            rm -rf "${OLD_DIR}"
+        fi
 
-    CURRENT=$(gsettings get org.cinnamon enabled-extensions 2>/dev/null || echo "[]")
-    if [[ "$CURRENT" == *"'${OLD_UUID}'"* || "$CURRENT" == *"\"${OLD_UUID}\""* ]]; then
-        NEW_LIST=$(python3 -c "
+        # Migrate config if exists
+        if [ -f "${OLD_CONFIG_DIR}/${OLD_UUID}.json" ] && [ ! -f "${NEW_CONFIG_DIR}/${UUID}.json" ]; then
+            echo "-> Preserving existing user preferences from ${OLD_UUID}..."
+            mkdir -p "${NEW_CONFIG_DIR}"
+            cp "${OLD_CONFIG_DIR}/${OLD_UUID}.json" "${NEW_CONFIG_DIR}/${UUID}.json"
+        fi
+
+        CURRENT=$(gsettings get org.cinnamon enabled-extensions 2>/dev/null || echo "[]")
+        if [[ "$CURRENT" == *"'${OLD_UUID}'"* || "$CURRENT" == *"\"${OLD_UUID}\""* ]]; then
+            NEW_LIST=$(python3 -c "
 import ast, re
 raw = re.sub(r'^@[a-z]+\s*', '', '''${CURRENT}'''.strip())
 try:
@@ -62,8 +63,8 @@ if '${OLD_UUID}' in current:
     current.remove('${OLD_UUID}')
 print(str(current))
 ")
-        gsettings set org.cinnamon enabled-extensions "${NEW_LIST}"
-        python3 -c "
+            gsettings set org.cinnamon enabled-extensions "${NEW_LIST}"
+            python3 -c "
 import dbus
 try:
     bus = dbus.SessionBus()
@@ -72,7 +73,8 @@ try:
 except:
     pass
 " 2>/dev/null || true
-    fi
+        fi
+    done
 }
 
 reload_extension() {

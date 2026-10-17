@@ -60,7 +60,7 @@ cd ~/Repos/CinnWin
 ./install.sh
 ```
 
-The script will symlink the extension into `~/.local/share/cinnamon/extensions/simple-tile@maciej`, register it in Cinnamon's `enabled-extensions`, migrate existing settings if upgrading, and reload the Cinnamon session automatically.
+The script will symlink the extension into `~/.local/share/cinnamon/extensions/simple-tile@SafenM`, register it in Cinnamon's `enabled-extensions`, migrate existing settings if upgrading, and reload the Cinnamon session automatically.
 
 ### Helper Commands:
 

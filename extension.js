@@ -2,7 +2,7 @@
 //
 // Simple Tile - Window Tiling for Cinnamon
 //
-// Author: maciej
+// Author: SafenM
 // Description: Simple Tile provides an intuitive, unobtrusive drop bar and shortcut
 // for tiling windows into clean layout templates in Cinnamon.
 
@@ -1028,7 +1028,7 @@ function init(meta) {
 }
 
 function enable() {
-    snapManager = new SnapManager('simple-tile@maciej');
+    snapManager = new SnapManager('simple-tile@SafenM');
     return snapManager;
 }
 
