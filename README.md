@@ -2,6 +2,8 @@
 
 A lightweight, fluid Cinnamon Desktop extension for intuitive window tiling and layout management in Linux Mint and Cinnamon Desktop environments.
 
+![Simple Tile Demo](assets/demo.gif)
+
 ---
 
 ## ✨ Features
