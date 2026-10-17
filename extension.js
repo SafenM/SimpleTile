@@ -17,8 +17,8 @@ const LAYOUT_PRESETS = [
         title: '50 / 50 Split',
         key: '1',
         zones: [
-            { id: 'left', x: 0, y: 0, w: 0.5, h: 1.0 },
-            { id: 'right', x: 0.5, y: 0, w: 0.5, h: 1.0 }
+            { id: 'left', x: 0, y: 0, w: 0.5, h: 1.0, mini: { x: 0, y: 0, w: 34, h: 44 } },
+            { id: 'right', x: 0.5, y: 0, w: 0.5, h: 1.0, mini: { x: 36, y: 0, w: 34, h: 44 } }
         ]
     },
     {
@@ -26,8 +26,8 @@ const LAYOUT_PRESETS = [
         title: '67 / 33 Priority Left',
         key: '2',
         zones: [
-            { id: 'left', x: 0, y: 0, w: 0.6667, h: 1.0 },
-            { id: 'right', x: 0.6667, y: 0, w: 0.3333, h: 1.0 }
+            { id: 'left', x: 0, y: 0, w: 0.6667, h: 1.0, mini: { x: 0, y: 0, w: 45, h: 44 } },
+            { id: 'right', x: 0.6667, y: 0, w: 0.3333, h: 1.0, mini: { x: 47, y: 0, w: 23, h: 44 } }
         ]
     },
     {
@@ -35,9 +35,9 @@ const LAYOUT_PRESETS = [
         title: '3 Equal Columns',
         key: '3',
         zones: [
-            { id: 'left', x: 0, y: 0, w: 0.3333, h: 1.0 },
-            { id: 'middle', x: 0.3333, y: 0, w: 0.3334, h: 1.0 },
-            { id: 'right', x: 0.6667, y: 0, w: 0.3333, h: 1.0 }
+            { id: 'left', x: 0, y: 0, w: 0.3333, h: 1.0, mini: { x: 0, y: 0, w: 22, h: 44 } },
+            { id: 'middle', x: 0.3333, y: 0, w: 0.3334, h: 1.0, mini: { x: 24, y: 0, w: 22, h: 44 } },
+            { id: 'right', x: 0.6667, y: 0, w: 0.3333, h: 1.0, mini: { x: 48, y: 0, w: 22, h: 44 } }
         ]
     },
     {
@@ -45,10 +45,10 @@ const LAYOUT_PRESETS = [
         title: '4 Quadrants Grid',
         key: '4',
         zones: [
-            { id: 'top-left', x: 0, y: 0, w: 0.5, h: 0.5 },
-            { id: 'top-right', x: 0.5, y: 0, w: 0.5, h: 0.5 },
-            { id: 'bottom-left', x: 0, y: 0.5, w: 0.5, h: 0.5 },
-            { id: 'bottom-right', x: 0.5, y: 0.5, w: 0.5, h: 0.5 }
+            { id: 'top-left', x: 0, y: 0, w: 0.5, h: 0.5, mini: { x: 0, y: 0, w: 34, h: 21 } },
+            { id: 'top-right', x: 0.5, y: 0, w: 0.5, h: 0.5, mini: { x: 36, y: 0, w: 34, h: 21 } },
+            { id: 'bottom-left', x: 0, y: 0.5, w: 0.5, h: 0.5, mini: { x: 0, y: 23, w: 34, h: 21 } },
+            { id: 'bottom-right', x: 0.5, y: 0.5, w: 0.5, h: 0.5, mini: { x: 36, y: 23, w: 34, h: 21 } }
         ]
     },
     {
@@ -56,9 +56,9 @@ const LAYOUT_PRESETS = [
         title: 'Center Focus (25 / 50 / 25)',
         key: '5',
         zones: [
-            { id: 'left', x: 0, y: 0, w: 0.25, h: 1.0 },
-            { id: 'center', x: 0.25, y: 0, w: 0.5, h: 1.0 },
-            { id: 'right', x: 0.75, y: 0, w: 0.25, h: 1.0 }
+            { id: 'left', x: 0, y: 0, w: 0.25, h: 1.0, mini: { x: 0, y: 0, w: 16, h: 44 } },
+            { id: 'center', x: 0.25, y: 0, w: 0.5, h: 1.0, mini: { x: 18, y: 0, w: 34, h: 44 } },
+            { id: 'right', x: 0.75, y: 0, w: 0.25, h: 1.0, mini: { x: 54, y: 0, w: 16, h: 44 } }
         ]
     }
 ];
@@ -180,9 +180,9 @@ class SnapBar {
         this._isInteractive = false;
         this._currentMonitor = null;
 
-        this._cardWidth = 76;
+        this._cardWidth = 78;
         this._cardHeight = 52;
-        this._innerPadX = 68;
+        this._innerPadX = 70;
         this._innerPadY = 44;
 
         this._buildUI();
@@ -201,7 +201,7 @@ class SnapBar {
         let handleBox = new St.BoxLayout({
             vertical: false,
             x_align: Clutter.ActorAlign.CENTER,
-            style: 'margin-bottom: 6px;'
+            style: 'margin-bottom: 8px;'
         });
         let handle = new St.Bin({
             style: 'width: 36px; height: 4px; background-color: rgba(255, 255, 255, 0.28); border-radius: 2px;'
@@ -256,27 +256,19 @@ class SnapBar {
             // Create each zone tile
             for (let j = 0; j < preset.zones.length; j++) {
                 let zone = preset.zones[j];
-                let zX = Math.round(zone.x * this._innerPadX);
-                let zY = Math.round(zone.y * this._innerPadY);
-                let zW = Math.round(zone.w * this._innerPadX);
-                let zH = Math.round(zone.h * this._innerPadY);
-
-                let isLeft = (zone.x === 0);
-                let isRight = (Math.abs(zone.x + zone.w - 1.0) < 0.01);
-                let isTop = (zone.y === 0);
-                let isBottom = (Math.abs(zone.y + zone.h - 1.0) < 0.01);
-
-                let left = zX + (isLeft ? 0 : 1);
-                let top = zY + (isTop ? 0 : 1);
-                let right = zX + zW - (isRight ? 0 : 1);
-                let bottom = zY + zH - (isBottom ? 0 : 1);
+                let m = zone.mini || {
+                    x: Math.round(zone.x * this._innerPadX),
+                    y: Math.round(zone.y * this._innerPadY),
+                    w: Math.round(zone.w * this._innerPadX),
+                    h: Math.round(zone.h * this._innerPadY)
+                };
 
                 let tile = new St.Bin({
                     style_class: 'cinnwin-zone-tile',
-                    x: left,
-                    y: top,
-                    width: Math.max(right - left, 1),
-                    height: Math.max(bottom - top, 1),
+                    x: m.x,
+                    y: m.y,
+                    width: m.w,
+                    height: m.h,
                     reactive: true
                 });
 
@@ -302,6 +294,8 @@ class SnapBar {
         if (!monitor) return;
 
         let workArea = this._manager.getWorkArea(monitor);
+        this.actor.set_width(-1);
+        this.actor.set_height(-1);
         let [, naturalWidth] = this.actor.get_preferred_width(-1);
         let [, naturalHeight] = this.actor.get_preferred_height(naturalWidth);
 
@@ -315,8 +309,6 @@ class SnapBar {
             targetX = workArea.x + Math.floor((workArea.width - naturalWidth) / 2);
         }
         let targetY = workArea.y;
-
-        this.actor.set_size(naturalWidth, naturalHeight);
 
         if (!this._isShowing) {
             this._currentMonitor = monitor;

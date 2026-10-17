@@ -6,7 +6,7 @@
     border-top: none;
     border-radius: 0px 0px 14px 14px;
     box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
-    padding: 10px 16px 12px 16px;
+    padding: 10px 18px 14px 18px;
 }
 
 .cinnwin-layout-card {
@@ -14,7 +14,6 @@
     border: 1px solid rgba(255, 255, 255, 0.10);
     border-radius: 6px;
     padding: 3px;
-    margin: 0px 4px;
 }
 
 .cinnwin-layout-card:hover {
