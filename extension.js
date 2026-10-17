@@ -63,33 +63,45 @@ const LAYOUT_PRESETS = [
     }
 ];
 
-function hexToRgba(hex, alpha) {
-    if (!hex) hex = '#0078d4';
-    hex = hex.replace('#', '');
+function parseRgb(colorStr) {
+    if (!colorStr) return [0, 120, 212];
+    colorStr = String(colorStr).trim();
+
+    let rgbMatch = colorStr.match(/rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+    if (rgbMatch) {
+        let r = Math.min(255, Math.max(0, parseInt(rgbMatch[1], 10)));
+        let g = Math.min(255, Math.max(0, parseInt(rgbMatch[2], 10)));
+        let b = Math.min(255, Math.max(0, parseInt(rgbMatch[3], 10)));
+        return [r, g, b];
+    }
+
+    let hex = colorStr.replace('#', '').trim();
     if (hex.length === 3) {
         hex = hex.split('').map(c => c + c).join('');
     }
-    let r = parseInt(hex.substring(0, 2), 16) || 0;
-    let g = parseInt(hex.substring(2, 4), 16) || 120;
-    let b = parseInt(hex.substring(4, 6), 16) || 212;
+    if (hex.length >= 6) {
+        let r = parseInt(hex.substring(0, 2), 16);
+        let g = parseInt(hex.substring(2, 4), 16);
+        let b = parseInt(hex.substring(4, 6), 16);
+        if (!isNaN(r) && !isNaN(g) && !isNaN(b)) {
+            return [r, g, b];
+        }
+    }
+
+    return [0, 120, 212];
+}
+
+function colorToRgba(colorStr, alpha) {
+    let [r, g, b] = parseRgb(colorStr);
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-function lightenHex(hex, factor = 0.3) {
-    if (!hex) hex = '#0078d4';
-    hex = hex.replace('#', '');
-    if (hex.length === 3) {
-        hex = hex.split('').map(c => c + c).join('');
-    }
-    let r = parseInt(hex.substring(0, 2), 16) || 0;
-    let g = parseInt(hex.substring(2, 4), 16) || 120;
-    let b = parseInt(hex.substring(4, 6), 16) || 212;
-
+function lightenColor(colorStr, factor = 0.3) {
+    let [r, g, b] = parseRgb(colorStr);
     r = Math.min(255, Math.round(r + (255 - r) * factor));
     g = Math.min(255, Math.round(g + (255 - g) * factor));
     b = Math.min(255, Math.round(b + (255 - b) * factor));
-
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+    return `rgb(${r}, ${g}, ${b})`;
 }
 
 class TilePreview {
@@ -113,8 +125,8 @@ class TilePreview {
         if (!rect) return;
 
         let accent = this._manager.accentColor;
-        let bg = hexToRgba(accent, 0.26);
-        let border = hexToRgba(accent, 0.88);
+        let bg = colorToRgba(accent, 0.26);
+        let border = colorToRgba(accent, 0.88);
         this.actor.set_style(`background-color: ${bg}; border: 2px solid ${border}; border-radius: 10px;`);
 
         this._currentRect = rect;
@@ -392,7 +404,7 @@ class SnapBar {
             tile.add_style_class_name('active');
 
             let accent = this._manager.accentColor;
-            let border = lightenHex(accent, 0.4);
+            let border = lightenColor(accent, 0.4);
             tile.set_style(`background-color: ${accent}; border: 1px solid ${border};`);
             this._activeHoveredItem.cardActor.add_style_class_name('hovered');
 
