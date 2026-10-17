@@ -1,0 +1,41 @@
+/* CinnWin - Snap Layouts Theme */
+
+.cinnwin-snap-bar {
+    background-color: rgba(24, 25, 30, 0.94);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-top: none;
+    border-radius: 0px 0px 14px 14px;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
+    padding: 10px 16px 12px 16px;
+}
+
+.cinnwin-layout-card {
+    background-color: rgba(42, 44, 52, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 6px;
+    padding: 3px;
+    margin: 0px 4px;
+}
+
+.cinnwin-layout-card:hover {
+    background-color: rgba(56, 58, 68, 0.85);
+    border-color: rgba(255, 255, 255, 0.22);
+}
+
+.cinnwin-zone-tile {
+    background-color: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+}
+
+.cinnwin-zone-tile.active,
+.cinnwin-zone-tile:hover {
+    background-color: #0078d4;
+    border: 1px solid #60cdff;
+}
+
+.cinnwin-tile-preview {
+    background-color: rgba(0, 120, 212, 0.28);
+    border: 2px solid rgba(0, 120, 212, 0.85);
+    border-radius: 10px;
+}

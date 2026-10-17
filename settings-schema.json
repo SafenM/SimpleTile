@@ -1,0 +1,85 @@
+{
+    "headerBehavior": {
+        "type": "header",
+        "description": "Snap Bar Behavior"
+    },
+    "show-on-drag": {
+        "type": "checkbox",
+        "default": true,
+        "description": "Show Snap Bar when dragging window to top of screen"
+    },
+    "trigger-distance": {
+        "type": "spinbutton",
+        "default": 60,
+        "min": 10,
+        "max": 120,
+        "step": 5,
+        "units": "px",
+        "description": "Activation distance from top screen edge"
+    },
+    "window-gap": {
+        "type": "spinbutton",
+        "default": 4,
+        "min": 0,
+        "max": 30,
+        "step": 1,
+        "units": "px",
+        "description": "Gap between tiled windows and screen edges"
+    },
+    "play-sound": {
+        "type": "checkbox",
+        "default": true,
+        "description": "Play snap audio feedback"
+    },
+
+    "separator1": {
+        "type": "separator"
+    },
+    "headerAppearance": {
+        "type": "header",
+        "description": "Appearance"
+    },
+    "accent-color": {
+        "type": "colorchooser",
+        "default": "#0078d4",
+        "description": "Accent highlight color"
+    },
+
+    "separator3": {
+        "type": "separator"
+    },
+    "headerLayouts": {
+        "type": "header",
+        "description": "Available Layouts"
+    },
+    "layout-two-equal": {
+        "type": "checkbox",
+        "default": true,
+        "description": "Layout 1: 50 / 50 Split"
+    },
+    "layout-two-priority": {
+        "type": "checkbox",
+        "default": true,
+        "description": "Layout 2: 67 / 33 Priority Left"
+    },
+    "layout-three-equal": {
+        "type": "checkbox",
+        "default": true,
+        "description": "Layout 3: 3 Equal Columns"
+    },
+    "layout-four-grid": {
+        "type": "checkbox",
+        "default": true,
+        "description": "Layout 4: 4 Quadrants (2x2)"
+    },
+    "layout-split-stacked": {
+        "type": "checkbox",
+        "default": true,
+        "description": "Layout 5: Left Half, 2 Stacked Right"
+    },
+    "layout-center-focus": {
+        "type": "checkbox",
+        "default": true,
+        "description": "Layout 6: Center Focus (25 / 50 / 25)"
+    }
+}
