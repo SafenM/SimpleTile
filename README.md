@@ -1,19 +1,20 @@
-# CinnWin - Snap Layouts & Window Management for Cinnamon
+# Simple Tile - Window Tiling for Cinnamon
 
-A modern, fluid Cinnamon Desktop extension for advanced window management and layout tiling in Linux Mint and Cinnamon Desktop environments.
+A lightweight, fluid Cinnamon Desktop extension for intuitive window tiling and layout management in Linux Mint and Cinnamon Desktop environments.
 
 ---
 
 ## ✨ Features
 
-- 🪟 **Drag-to-Top Snap Bar**: Drag any window toward the top edge of your monitor to smoothly slide down the Snap Bar with preset layout templates.
+- 🪟 **Drag-to-Top Tiling Bar**: Drag any window toward the top edge of your monitor to smoothly slide down the Simple Tile bar with preset layout templates.
 - 🎯 **Live Tile Previews**: Hovering over any zone inside the bar displays a translucent accent preview on your desktop showing the exact bounding area.
 - ⚡ **Instant Snapping**: Release your mouse over any zone to snap the window directly into that predetermined space with native audio feedback.
-- 🖥️ **Full Multi-Monitor Support**: Works seamlessly across multiple monitors, detecting cursor position and placing the Snap Bar and preview on the correct display.
+- ⌨️ **Keyboard Shortcut**: Optionally configure a hotkey to trigger the interactive tiling overlay for the focused window without dragging.
+- 🖥️ **Full Multi-Monitor Support**: Works seamlessly across multiple monitors, detecting cursor position and placing the tiling bar and preview on the correct display.
 - 📐 **Panel & Dock Aware**: Automatically queries work area geometry to respect top panels, bottom panels, and docks without overlapping.
-- 🎨 **Fluent Aesthetics & Customization**:
+- 🎨 **Clean Aesthetics & Customization**:
   - Frosted glass container with rounded bottom corners and subtle borders.
-  - Modern vibrant blue accent (`#0078d4`) or choose your own custom color.
+  - Customizable accent color with live preview and zone highlights.
   - Adjustable window padding / gaps (from 0px flush tiling to modern 4–8px spacing).
   - Configurable trigger distance from the screen edge.
   - Toggle individual layouts on or off in settings.
@@ -34,7 +35,7 @@ A modern, fluid Cinnamon Desktop extension for advanced window management and la
 
 ## 🚫 Disabling Cinnamon's Default Snapping
 
-To avoid having Cinnamon's default snapping (which maximizes or tiles windows when dragging to edges) compete with CinnWin:
+To avoid having Cinnamon's default snapping (which maximizes or tiles windows when dragging to edges) compete with Simple Tile:
 
 ### Option A: Via Command Line (Instant)
 ```bash
@@ -59,7 +60,7 @@ cd ~/Repos/CinnWin
 ./install.sh
 ```
 
-The script will symlink the extension into `~/.local/share/cinnamon/extensions/cinnwin@snaplayouts`, register it in Cinnamon's `enabled-extensions`, and reload the Cinnamon session automatically.
+The script will symlink the extension into `~/.local/share/cinnamon/extensions/simple-tile@maciej`, register it in Cinnamon's `enabled-extensions`, migrate existing settings if upgrading, and reload the Cinnamon session automatically.
 
 ### Helper Commands:
 
@@ -85,8 +86,8 @@ The script will symlink the extension into `~/.local/share/cinnamon/extensions/c
 ## 🎮 How to Use
 
 1. Grab any window by its titlebar with your mouse.
-2. Drag it toward the **top edge** of any screen.
-3. The **Snap Bar** drops down smoothly from the top, directly above your cursor.
+2. Drag it toward the **top edge** of any screen (or press your configured keyboard shortcut).
+3. The **Simple Tile Bar** drops down smoothly from the top, directly above your cursor.
 4. Move your cursor over one of the miniature zones in any layout template.
 5. A translucent preview rectangle illuminates the screen area where the window will land.
 6. **Release the mouse button** to snap the window into that space!
@@ -96,12 +97,12 @@ The script will symlink the extension into `~/.local/share/cinnamon/extensions/c
 
 ## ⚙️ Configuration & Settings
 
-You can adjust all options natively in **System Settings** -> **Extensions** -> **CinnWin - Snap Layouts** -> **Configure (Gear icon)**:
+You can adjust all options natively in **System Settings** -> **Extensions** -> **Simple Tile** -> **Configure (Gear icon)**:
 
-- **Trigger distance**: Pixels from the top screen edge required to drop down the snap bar (default: `60px`).
+- **Trigger distance**: Pixels from the top screen edge required to drop down the tile bar (default: `40px`–`60px`).
 - **Window gap**: Spacing between tiled windows and screen edges (default: `4px`, set to `0px` for flush edge-to-edge tiling).
-- **Keyboard shortcut**: Optional shortcut key to display Snap Layouts for the active window without dragging (unassigned by default).
-- **Accent color**: Highlight color for active zones and screen preview (default: `#0078d4`).
+- **Keyboard shortcut**: Optional shortcut key to display Simple Tile for the active window without dragging (unassigned by default).
+- **Accent color**: Highlight color for active zones and screen preview.
 - **Play sound**: Audio feedback when a window snaps into place.
 - **Enable/disable individual layouts**: Show only the layouts you use most often.
 

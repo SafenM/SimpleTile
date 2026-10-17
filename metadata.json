@@ -1,7 +1,7 @@
 {
-    "uuid": "cinnwin@snaplayouts",
-    "name": "CinnWin - Snap Layouts",
-    "description": "Snap Layouts and tiling bar for Cinnamon window management. Drag a window to the top of any screen to choose a layout and snap windows.",
+    "uuid": "simple-tile@maciej",
+    "name": "Simple Tile",
+    "description": "Simple and intuitive window tiling for Cinnamon. Drag a window to the top of any screen or use a shortcut to choose a layout and tile windows.",
     "version": "1.0.0",
     "cinnamon-version": [
         "5.4",
@@ -12,7 +12,6 @@
         "6.4",
         "6.6"
     ],
-    "multiversion": false,
-    "url": "https://github.com/maciej/CinnWin",
-    "author": "maciej"
+    "author": "maciej",
+    "url": "https://github.com/maciej/simple-tile"
 }

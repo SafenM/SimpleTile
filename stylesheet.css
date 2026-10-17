@@ -1,6 +1,6 @@
-/* CinnWin - Snap Layouts Theme */
+/* Simple Tile - Cinnamon Window Tiling Theme */
 
-.cinnwin-snap-bar {
+.simple-tile-bar {
     background-color: rgba(24, 25, 30, 0.94);
     border: 1px solid rgba(255, 255, 255, 0.14);
     border-top: none;
@@ -9,31 +9,32 @@
     padding: 10px 18px 14px 18px;
 }
 
-.cinnwin-layout-card {
+.simple-tile-card {
     background-color: rgba(42, 44, 52, 0.7);
     border: 1px solid rgba(255, 255, 255, 0.10);
     border-radius: 6px;
     padding: 3px;
 }
 
-.cinnwin-layout-card:hover {
+.simple-tile-card:hover,
+.simple-tile-card.hovered {
     background-color: rgba(56, 58, 68, 0.85);
     border-color: rgba(255, 255, 255, 0.22);
 }
 
-.cinnwin-zone-tile {
+.simple-tile-zone {
     background-color: rgba(255, 255, 255, 0.18);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 3px;
 }
 
-.cinnwin-zone-tile.active,
-.cinnwin-zone-tile:hover {
+.simple-tile-zone.active,
+.simple-tile-zone:hover {
     background-color: #0078d4;
     border: 1px solid #60cdff;
 }
 
-.cinnwin-tile-preview {
+.simple-tile-preview {
     background-color: rgba(0, 120, 212, 0.28);
     border: 2px solid rgba(0, 120, 212, 0.85);
     border-radius: 10px;

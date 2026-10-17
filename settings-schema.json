@@ -1,12 +1,12 @@
 {
     "headerBehavior": {
         "type": "header",
-        "description": "Snap Bar Behavior"
+        "description": "Tiling Bar Behavior"
     },
     "show-on-drag": {
         "type": "checkbox",
         "default": true,
-        "description": "Show Snap Bar when dragging window to top of screen"
+        "description": "Show Tiling Bar when dragging window to top of screen"
     },
     "trigger-distance": {
         "type": "spinbutton",
@@ -29,7 +29,7 @@
     "play-sound": {
         "type": "checkbox",
         "default": true,
-        "description": "Play snap audio feedback"
+        "description": "Play audio feedback when window is tiled"
     },
 
     "separator1": {
@@ -42,8 +42,8 @@
     "snap-hotkey": {
         "type": "keybinding",
         "default": "",
-        "description": "Keyboard shortcut to show Snap Layouts",
-        "tooltip": "Set a key combination to show Snap Layouts for the focused window (unassigned by default)."
+        "description": "Keyboard shortcut to show Tiling Bar",
+        "tooltip": "Set a key combination to show the Simple Tile bar for the focused window (unassigned by default)."
     },
 
     "separator2": {

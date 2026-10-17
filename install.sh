@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 #
-# CinnWin - Snap Layouts & Window Management for Cinnamon
+# Simple Tile - Window Tiling for Cinnamon
 # Installer & Management Script
 #
 
 set -e
 
-UUID="cinnwin@snaplayouts"
+UUID="simple-tile@maciej"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 EXT_DIR="${HOME}/.local/share/cinnamon/extensions/${UUID}"
 
 echo "=========================================="
-echo "  CinnWin: Snap Layouts Window Management"
+echo "  Simple Tile: Cinnamon Window Tiling"
 echo "  Cinnamon Desktop Extension Installer"
 echo "=========================================="
 
@@ -28,6 +28,51 @@ usage() {
     echo "  --help, -h        Show this help message"
     echo ""
     exit 0
+}
+
+cleanup_legacy() {
+    # Migrate old cinnwin@snaplayouts if present
+    OLD_UUID="cinnwin@snaplayouts"
+    OLD_DIR="${HOME}/.local/share/cinnamon/extensions/${OLD_UUID}"
+    OLD_CONFIG_DIR="${HOME}/.config/cinnamon/spices/${OLD_UUID}"
+    NEW_CONFIG_DIR="${HOME}/.config/cinnamon/spices/${UUID}"
+
+    if [ -e "${OLD_DIR}" ]; then
+        echo "-> Cleaning up legacy ${OLD_UUID}..."
+        rm -rf "${OLD_DIR}"
+    fi
+
+    # Migrate config if exists
+    if [ -f "${OLD_CONFIG_DIR}/${OLD_UUID}.json" ] && [ ! -f "${NEW_CONFIG_DIR}/${UUID}.json" ]; then
+        echo "-> Preserving existing user preferences..."
+        mkdir -p "${NEW_CONFIG_DIR}"
+        cp "${OLD_CONFIG_DIR}/${OLD_UUID}.json" "${NEW_CONFIG_DIR}/${UUID}.json"
+    fi
+
+    CURRENT=$(gsettings get org.cinnamon enabled-extensions 2>/dev/null || echo "[]")
+    if [[ "$CURRENT" == *"'${OLD_UUID}'"* || "$CURRENT" == *"\"${OLD_UUID}\""* ]]; then
+        NEW_LIST=$(python3 -c "
+import ast, re
+raw = re.sub(r'^@[a-z]+\s*', '', '''${CURRENT}'''.strip())
+try:
+    current = ast.literal_eval(raw)
+except Exception:
+    current = []
+if '${OLD_UUID}' in current:
+    current.remove('${OLD_UUID}')
+print(str(current))
+")
+        gsettings set org.cinnamon enabled-extensions "${NEW_LIST}"
+        python3 -c "
+import dbus
+try:
+    bus = dbus.SessionBus()
+    cinnamon = bus.get_object('org.Cinnamon', '/org/Cinnamon')
+    cinnamon.Eval('imports.ui.extension.unloadExtension(\"${OLD_UUID}\", imports.ui.extension.Type.EXTENSION);', dbus_interface='org.Cinnamon')
+except:
+    pass
+" 2>/dev/null || true
+    fi
 }
 
 reload_extension() {
@@ -53,10 +98,13 @@ enable_extension() {
     echo "-> Enabling ${UUID} in gsettings..."
     CURRENT=$(gsettings get org.cinnamon enabled-extensions)
     if [[ "$CURRENT" != *"'${UUID}'"* && "$CURRENT" != *"\"${UUID}\""* ]]; then
-        # Add to enabled-extensions list
         NEW_LIST=$(python3 -c "
-import ast
-current = ast.literal_eval('''${CURRENT}''')
+import ast, re
+raw = re.sub(r'^@[a-z]+\s*', '', '''${CURRENT}'''.strip())
+try:
+    current = ast.literal_eval(raw)
+except Exception:
+    current = []
 if '${UUID}' not in current:
     current.append('${UUID}')
 print(str(current))
@@ -73,8 +121,12 @@ disable_extension() {
     CURRENT=$(gsettings get org.cinnamon enabled-extensions)
     if [[ "$CURRENT" == *"'${UUID}'"* || "$CURRENT" == *"\"${UUID}\""* ]]; then
         NEW_LIST=$(python3 -c "
-import ast
-current = ast.literal_eval('''${CURRENT}''')
+import ast, re
+raw = re.sub(r'^@[a-z]+\s*', '', '''${CURRENT}'''.strip())
+try:
+    current = ast.literal_eval(raw)
+except Exception:
+    current = []
 if '${UUID}' in current:
     current.remove('${UUID}')
 print(str(current))
@@ -94,6 +146,7 @@ except:
 }
 
 install_symlink() {
+    cleanup_legacy
     echo "-> Installing development symlink..."
     mkdir -p "${HOME}/.local/share/cinnamon/extensions"
     ln -sfn "${SCRIPT_DIR}" "${EXT_DIR}"
@@ -104,6 +157,7 @@ install_symlink() {
 }
 
 install_copy() {
+    cleanup_legacy
     echo "-> Installing by copying files..."
     mkdir -p "${EXT_DIR}"
     rm -rf "${EXT_DIR}"/*

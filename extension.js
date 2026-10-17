@@ -1,11 +1,10 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 //
-// CinnWin - Snap Layouts & Window Management for Cinnamon
+// Simple Tile - Window Tiling for Cinnamon
 //
 // Author: maciej
-// Description: Snap Bar and Snap Layouts extension for window management in Cinnamon.
-// Supports drag-to-top snapping, multi-monitor setups,
-// customizable layouts, gaps, and accents.
+// Description: Simple Tile provides an intuitive, unobtrusive drop bar and shortcut
+// for tiling windows into clean layout templates in Cinnamon.
 
 const { Clutter, St, Meta, GLib, Gio } = imports.gi;
 const Main = imports.ui.main;
@@ -108,7 +107,7 @@ class TilePreview {
     constructor(manager) {
         this._manager = manager;
         this.actor = new St.Bin({
-            style_class: 'cinnwin-tile-preview',
+            style_class: 'simple-tile-preview',
             important: true,
             reactive: false,
             can_focus: false
@@ -203,7 +202,7 @@ class SnapBar {
     _buildUI() {
         // Main container
         this.actor = new St.BoxLayout({
-            style_class: 'cinnwin-snap-bar',
+            style_class: 'simple-tile-bar',
             vertical: true,
             reactive: true,
             can_focus: true
@@ -252,7 +251,7 @@ class SnapBar {
 
             // Miniature screen card
             let cardActor = new St.Bin({
-                style_class: 'cinnwin-layout-card',
+                style_class: 'simple-tile-card',
                 width: this._cardWidth,
                 height: this._cardHeight,
                 reactive: true
@@ -276,7 +275,7 @@ class SnapBar {
                 };
 
                 let tile = new St.Bin({
-                    style_class: 'cinnwin-zone-tile',
+                    style_class: 'simple-tile-zone',
                     x: m.x,
                     y: m.y,
                     width: m.w,
@@ -505,7 +504,7 @@ class SnapManager {
             this.settings.bindProperty(Settings.BindingDirection.IN, 'layout-four-grid', 'layoutFourGrid', this._onLayoutsChanged.bind(this), null);
             this.settings.bindProperty(Settings.BindingDirection.IN, 'layout-center-focus', 'layoutCenterFocus', this._onLayoutsChanged.bind(this), null);
         } catch (e) {
-            global.logWarning(`CinnWin: Could not initialize settings: ${e.message}`);
+            global.logWarning(`SimpleTile: Could not initialize settings: ${e.message}`);
         }
     }
 
@@ -515,14 +514,14 @@ class SnapManager {
 
     _setupHotkey() {
         try {
-            Main.keybindingManager.removeHotKey('cinnwin-snap-layouts');
+            Main.keybindingManager.removeHotKey('simple-tile');
             if (this.snapHotkey && typeof this.snapHotkey === 'string' && this.snapHotkey.trim() !== '') {
-                Main.keybindingManager.addHotKey('cinnwin-snap-layouts', this.snapHotkey, () => {
+                Main.keybindingManager.addHotKey('simple-tile', this.snapHotkey, () => {
                     this.toggleInteractiveOverlay();
                 });
             }
         } catch (e) {
-            global.logWarning(`CinnWin: Failed to update hotkey: ${e.message}`);
+            global.logWarning(`SimpleTile: Failed to update hotkey: ${e.message}`);
         }
     }
 
@@ -761,7 +760,7 @@ class SnapManager {
                     win.move_resize_frame(true, targetRect.x, targetRect.y, targetRect.width, targetRect.height);
                 }
             } catch (e) {
-                global.logWarning(`CinnWin snap window error: ${e.message}`);
+                global.logWarning(`SimpleTile snap window error: ${e.message}`);
             }
         };
 
@@ -821,7 +820,7 @@ class SnapManager {
         barActor.reactive = true;
 
         if (!Main.pushModal(barActor)) {
-            global.logWarning('CinnWin: Failed to push modal');
+            global.logWarning('SimpleTile: Failed to push modal');
             this.snapBar.hide(true);
             return;
         }
@@ -977,7 +976,7 @@ class SnapManager {
             try {
                 Main.popModal(barActor);
             } catch (e) {
-                global.logWarning(`CinnWin: popModal error: ${e.message}`);
+                global.logWarning(`SimpleTile: popModal error: ${e.message}`);
             }
         }
 
@@ -994,7 +993,7 @@ class SnapManager {
         this._closeInteractiveModal();
 
         try {
-            Main.keybindingManager.removeHotKey('cinnwin-snap-layouts');
+            Main.keybindingManager.removeHotKey('simple-tile');
         } catch (e) {}
 
         if (this._tickTimerId) {
@@ -1029,7 +1028,7 @@ function init(meta) {
 }
 
 function enable() {
-    snapManager = new SnapManager('cinnwin@snaplayouts');
+    snapManager = new SnapManager('simple-tile@maciej');
     return snapManager;
 }
 
