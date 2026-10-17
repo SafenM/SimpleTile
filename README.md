@@ -101,6 +101,7 @@ You can adjust all options natively in **System Settings** -> **Extensions** -> 
 
 - **Trigger distance**: Pixels from the top screen edge required to drop down the snap bar (default: `60px`).
 - **Window gap**: Spacing between tiled windows and screen edges (default: `4px`, set to `0px` for flush edge-to-edge tiling).
+- **Keyboard shortcut**: Optional shortcut key to display Snap Layouts for the active window without dragging (unassigned by default).
 - **Accent color**: Highlight color for active zones and screen preview (default: `#0078d4`).
 - **Play sound**: Audio feedback when a window snaps into place.
 - **Enable/disable individual layouts**: Show only the layouts you use most often.

@@ -203,7 +203,8 @@ class SnapBar {
         this.actor = new St.BoxLayout({
             style_class: 'cinnwin-snap-bar',
             vertical: true,
-            reactive: true
+            reactive: true,
+            can_focus: true
         });
 
         // Top drag handle / indicator
@@ -468,6 +469,7 @@ class SnapManager {
         this.windowGap = 4;
         this.playSound = true;
         this.showOnDrag = true;
+        this.snapHotkey = '';
 
         this.layoutTwoEqual = true;
         this.layoutTwoPriority = true;
@@ -479,13 +481,19 @@ class SnapManager {
         this._tickTimerId = 0;
         this._draggedWindow = null;
         this._currentMonitor = null;
+        this._targetWindow = null;
         this._isDragging = false;
+        this._isModalActive = false;
+        this._capturedEventId = 0;
+        this._keyboardSelectedPresetIndex = 0;
+        this._keyboardSelectedZoneIndex = 0;
 
         this._initSettings();
         this.tilePreview = new TilePreview(this);
         this.snapBar = new SnapBar(this);
 
         this._bindSignals();
+        this._setupHotkey();
     }
 
     _initSettings() {
@@ -496,6 +504,7 @@ class SnapManager {
             this.settings.bindProperty(Settings.BindingDirection.IN, 'window-gap', 'windowGap', this._onSettingsChanged.bind(this), null);
             this.settings.bindProperty(Settings.BindingDirection.IN, 'play-sound', 'playSound', this._onSettingsChanged.bind(this), null);
             this.settings.bindProperty(Settings.BindingDirection.IN, 'show-on-drag', 'showOnDrag', this._onSettingsChanged.bind(this), null);
+            this.settings.bindProperty(Settings.BindingDirection.IN, 'snap-hotkey', 'snapHotkey', this._onHotkeyChanged.bind(this), null);
 
             this.settings.bindProperty(Settings.BindingDirection.IN, 'layout-two-equal', 'layoutTwoEqual', this._onLayoutsChanged.bind(this), null);
             this.settings.bindProperty(Settings.BindingDirection.IN, 'layout-two-priority', 'layoutTwoPriority', this._onLayoutsChanged.bind(this), null);
@@ -505,6 +514,23 @@ class SnapManager {
             this.settings.bindProperty(Settings.BindingDirection.IN, 'layout-center-focus', 'layoutCenterFocus', this._onLayoutsChanged.bind(this), null);
         } catch (e) {
             global.logWarning(`CinnWin: Could not initialize settings: ${e.message}`);
+        }
+    }
+
+    _onHotkeyChanged() {
+        this._setupHotkey();
+    }
+
+    _setupHotkey() {
+        try {
+            Main.keybindingManager.removeHotKey('cinnwin-snap-layouts');
+            if (this.snapHotkey && typeof this.snapHotkey === 'string' && this.snapHotkey.trim() !== '') {
+                Main.keybindingManager.addHotKey('cinnwin-snap-layouts', this.snapHotkey, () => {
+                    this.toggleInteractiveOverlay();
+                });
+            }
+        } catch (e) {
+            global.logWarning(`CinnWin: Failed to update hotkey: ${e.message}`);
         }
     }
 
@@ -770,7 +796,216 @@ class SnapManager {
         }
     }
 
+    toggleInteractiveOverlay() {
+        if (this._isModalActive) {
+            this._closeInteractiveModal();
+            return;
+        }
+
+        if (this._isDragging) {
+            return;
+        }
+
+        let win = global.display.focus_window;
+        if (!win || !this._isValidTilingWindow(win)) {
+            return;
+        }
+
+        let monIndex = win.get_monitor();
+        let monitor = Main.layoutManager.monitors[monIndex] || Main.layoutManager.primaryMonitor;
+        this._currentMonitor = monitor;
+        this._targetWindow = win;
+        this._keyboardSelectedPresetIndex = 0;
+        this._keyboardSelectedZoneIndex = 0;
+
+        this.snapBar.show(monitor, null);
+        this._openInteractiveModal();
+    }
+
+    _openInteractiveModal() {
+        if (this._isModalActive) return;
+
+        let barActor = this.snapBar.getActor();
+        barActor.can_focus = true;
+        barActor.reactive = true;
+
+        if (!Main.pushModal(barActor)) {
+            global.logWarning('CinnWin: Failed to push modal');
+            this.snapBar.hide(true);
+            return;
+        }
+
+        this._isModalActive = true;
+        barActor.grab_key_focus();
+
+        this._highlightPresetZone(0, 0);
+
+        this._capturedEventId = global.stage.connect('captured-event', (stage, event) => {
+            return this._onModalCapturedEvent(event);
+        });
+    }
+
+    _onModalCapturedEvent(event) {
+        if (!this._isModalActive) return Clutter.EVENT_PROPAGATE;
+
+        let type = event.type();
+
+        if (type === Clutter.EventType.KEY_PRESS) {
+            let symbol = event.get_key_symbol();
+
+            if (symbol === Clutter.KEY_Escape) {
+                this._closeInteractiveModal();
+                return Clutter.EVENT_STOP;
+            }
+
+            let presets = this.getEnabledPresets();
+            if (presets.length === 0) return Clutter.EVENT_STOP;
+
+            let numPressed = -1;
+            if (symbol >= Clutter.KEY_1 && symbol <= Clutter.KEY_9) {
+                numPressed = symbol - Clutter.KEY_1;
+            } else if (symbol >= Clutter.KEY_KP_1 && symbol <= Clutter.KEY_KP_9) {
+                numPressed = symbol - Clutter.KEY_KP_1;
+            }
+
+            if (numPressed >= 0 && numPressed < presets.length) {
+                if (this._keyboardSelectedPresetIndex === numPressed) {
+                    this._keyboardSelectedZoneIndex = (this._keyboardSelectedZoneIndex + 1) % presets[numPressed].zones.length;
+                } else {
+                    this._keyboardSelectedPresetIndex = numPressed;
+                    this._keyboardSelectedZoneIndex = 0;
+                }
+                this._highlightPresetZone(this._keyboardSelectedPresetIndex, this._keyboardSelectedZoneIndex);
+                return Clutter.EVENT_STOP;
+            }
+
+            if (symbol === Clutter.KEY_Left) {
+                this._keyboardSelectedPresetIndex = (this._keyboardSelectedPresetIndex - 1 + presets.length) % presets.length;
+                this._keyboardSelectedZoneIndex = 0;
+                this._highlightPresetZone(this._keyboardSelectedPresetIndex, this._keyboardSelectedZoneIndex);
+                return Clutter.EVENT_STOP;
+            }
+
+            if (symbol === Clutter.KEY_Right) {
+                this._keyboardSelectedPresetIndex = (this._keyboardSelectedPresetIndex + 1) % presets.length;
+                this._keyboardSelectedZoneIndex = 0;
+                this._highlightPresetZone(this._keyboardSelectedPresetIndex, this._keyboardSelectedZoneIndex);
+                return Clutter.EVENT_STOP;
+            }
+
+            if (symbol === Clutter.KEY_Up || symbol === Clutter.KEY_Down) {
+                let curPreset = presets[this._keyboardSelectedPresetIndex];
+                if (curPreset && curPreset.zones.length > 1) {
+                    if (symbol === Clutter.KEY_Down) {
+                        this._keyboardSelectedZoneIndex = (this._keyboardSelectedZoneIndex + 1) % curPreset.zones.length;
+                    } else {
+                        this._keyboardSelectedZoneIndex = (this._keyboardSelectedZoneIndex - 1 + curPreset.zones.length) % curPreset.zones.length;
+                    }
+                    this._highlightPresetZone(this._keyboardSelectedPresetIndex, this._keyboardSelectedZoneIndex);
+                }
+                return Clutter.EVENT_STOP;
+            }
+
+            if (symbol === Clutter.KEY_Return || symbol === Clutter.KEY_KP_Enter || symbol === Clutter.KEY_space) {
+                let curPreset = presets[this._keyboardSelectedPresetIndex];
+                if (curPreset && this._targetWindow) {
+                    let zone = curPreset.zones[this._keyboardSelectedZoneIndex % curPreset.zones.length];
+                    this.snapWindowToZone(this._targetWindow, zone, this._currentMonitor);
+                }
+                this._closeInteractiveModal();
+                return Clutter.EVENT_STOP;
+            }
+
+            return Clutter.EVENT_PROPAGATE;
+        }
+
+        if (type === Clutter.EventType.MOTION) {
+            let [px, py] = global.get_pointer();
+            let item = this.snapBar.hitTest(px, py);
+            if (item) {
+                this._keyboardSelectedPresetIndex = item.cardIndex;
+                this._keyboardSelectedZoneIndex = item.zoneIndex;
+                this.snapBar.setHoveredItem(item);
+            }
+            return Clutter.EVENT_PROPAGATE;
+        }
+
+        if (type === Clutter.EventType.BUTTON_PRESS) {
+            let [px, py] = global.get_pointer();
+            let [bx, by] = this.snapBar.actor.get_transformed_position();
+            let [bw, bh] = this.snapBar.actor.get_transformed_size();
+
+            // Click outside the bar dismisses the modal
+            if (px < bx || px > bx + bw || py < by || py > by + bh) {
+                this._closeInteractiveModal();
+                return Clutter.EVENT_STOP;
+            }
+            return Clutter.EVENT_PROPAGATE;
+        }
+
+        if (type === Clutter.EventType.BUTTON_RELEASE) {
+            let [px, py] = global.get_pointer();
+            let item = this.snapBar.hitTest(px, py);
+            if (item && this._targetWindow) {
+                this.snapWindowToZone(this._targetWindow, item.zone, this._currentMonitor);
+                this._closeInteractiveModal();
+                return Clutter.EVENT_STOP;
+            }
+            return Clutter.EVENT_PROPAGATE;
+        }
+
+        return Clutter.EVENT_PROPAGATE;
+    }
+
+    _highlightPresetZone(presetIdx, zoneIdx) {
+        let presets = this.getEnabledPresets();
+        if (presets.length === 0 || presetIdx >= presets.length) return;
+        let targetPreset = presets[presetIdx];
+        if (!targetPreset || !targetPreset.zones || targetPreset.zones.length === 0) return;
+        let targetZone = targetPreset.zones[zoneIdx % targetPreset.zones.length];
+
+        for (let item of this.snapBar._zoneItems) {
+            if (item.preset === targetPreset && item.zone === targetZone) {
+                this.snapBar.setHoveredItem(item);
+                break;
+            }
+        }
+    }
+
+    _closeInteractiveModal() {
+        if (!this._isModalActive) return;
+        this._isModalActive = false;
+
+        if (this._capturedEventId) {
+            global.stage.disconnect(this._capturedEventId);
+            this._capturedEventId = 0;
+        }
+
+        let barActor = this.snapBar ? this.snapBar.getActor() : null;
+        if (barActor) {
+            try {
+                Main.popModal(barActor);
+            } catch (e) {
+                global.logWarning(`CinnWin: popModal error: ${e.message}`);
+            }
+        }
+
+        if (this.snapBar) {
+            this.snapBar.hide(false);
+        }
+        if (this.tilePreview) {
+            this.tilePreview.hide();
+        }
+        this._targetWindow = null;
+    }
+
     destroy() {
+        this._closeInteractiveModal();
+
+        try {
+            Main.keybindingManager.removeHotKey('cinnwin-snap-layouts');
+        } catch (e) {}
+
         if (this._tickTimerId) {
             GLib.source_remove(this._tickTimerId);
             this._tickTimerId = 0;
