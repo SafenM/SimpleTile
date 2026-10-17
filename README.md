@@ -56,7 +56,8 @@ gsettings set org.cinnamon.muffin edge-tiling false
 Clone or open the repository directory and run the installer script:
 
 ```bash
-cd ~/Repos/CinnWin
+git clone https://github.com/SafenM/SimpleTile.git
+cd SimpleTile
 ./install.sh
 ```
 
